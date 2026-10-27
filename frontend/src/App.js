@@ -1,38 +1,64 @@
 import React, { useState } from 'react';
 import ResumeUpload from './components/ResumeUpload';
 import AnalysisResults from './components/AnalysisResults';
-import ResumeScore from './components/ResumeScore';
-import './styles.css'; // Import the new CSS file
+import './styles.css';
 
 function App() {
-  const [analysisResults, setAnalysisResults] = useState(null);
+  const [results, setResults] = useState(null);
+  const [error, setError]     = useState(null);
 
-  // Dummy handlers to prevent errors
-  const handleError = (msg) => alert(msg);
-  const handleAnalysisComplete = (data) => setAnalysisResults(data);
-  const setLoading = (loading) => {};
-  
+  const handleError = (msg) => {
+    setError(msg);
+    setTimeout(() => setError(null), 5000);
+  };
+
+  const handleReset = () => setResults(null);
+
   return (
-    <div className="startup-card">
-      <div className="heading-serif">Resume Analyzer</div>
-      {!analysisResults ? (
+    <div className="app-container">
+      {/* ── Hero Header ── */}
+      <header className="hero-header">
+        <h1 className="hero-title">Resume Analyzer</h1>
+        <p className="hero-sub">AI-powered · Skills Extraction · Job Match Scoring</p>
+        <div className="hero-line" />
+      </header>
+
+      {/* ── Error Toast ── */}
+      {error && (
+        <div
+          id="error-toast"
+          style={{
+            background: 'rgba(255,107,53,0.12)',
+            border: '1px solid rgba(255,107,53,0.4)',
+            color: '#ff6b35',
+            borderRadius: '12px',
+            padding: '0.75rem 1.25rem',
+            marginBottom: '1.5rem',
+            fontSize: '0.9rem',
+            maxWidth: '760px',
+            width: '100%',
+            textAlign: 'center',
+            animation: 'fadeUp 0.3s ease-out',
+          }}
+        >
+          ⚠️ {error}
+        </div>
+      )}
+
+      {/* ── Main Content ── */}
+      {!results ? (
         <ResumeUpload
           onError={handleError}
-          onAnalysisComplete={handleAnalysisComplete}
-          setLoading={setLoading}
+          onAnalysisComplete={setResults}
         />
       ) : (
-        <>
-          <AnalysisResults results={analysisResults} loading={false} error={null} />
-          <div style={{ marginTop: '2.5rem' }}>
-            {analysisResults.score !== undefined && (
-              <ResumeScore score={analysisResults.score} />
-            )}
-          </div>
-        </>
+        <AnalysisResults
+          results={results}
+          onReset={handleReset}
+        />
       )}
     </div>
   );
 }
 
-export default App; 
+export default App;
